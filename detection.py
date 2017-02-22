@@ -2,31 +2,39 @@
 import glob, os
 import numpy as np
 import cv2
-from matplotlib import pyplot as plt
+
+db_imgs = [] # array of database images
+db_files = []# array of names of database images
+db_kp = [] # keypoints of database images
+db_des = [] # descriptors of database images
+# Create ORB detector with 1000 keypoints with a scaling pyramid factor of 1.2
+orb = cv2.ORB(1000, 1.2) # feature extration object
+# Create Brute Force Matcher
+bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+
+# Load images from database
+def load_database():
+    del db_imgs[:]
+    del db_files[:]
+    del db_kp[:]
+    del db_des[:]
+    for file in glob.glob("./static/db/*.jpg"):
+        print(file)
+        db_files.append(file)
+
+    for i_img in range(len(db_files)):
+        img = cv2.imread(db_files[i_img], 0)
+        cols,rows = img.shape
+        img = cv2.resize(img, (500*rows/cols,500))
+        db_imgs.append(img)
+        (kp, des) = orb.detectAndCompute(db_imgs[i_img], None)
+        db_kp.append(kp)
+        db_des.append(des)
+
+# Load Database on startup
+load_database()
 
 def drawMatches(img1, kp1, img2, kp2, matches):
-    """
-    My own implementation of cv2.drawMatches as OpenCV 2.4.9
-    does not have this function available but it's supported in
-    OpenCV 3.0.0
-
-    This function takes in two images with their associated 
-    keypoints, as well as a list of DMatch data structure (matches) 
-    that contains which keypoints matched in which images.
-
-    An image will be produced where a montage is shown with
-    the first image followed by the second image beside it.
-
-    Keypoints are delineated with circles, while lines are connected
-    between matching keypoints.
-
-    img1,img2 - Grayscale images
-    kp1,kp2 - Detected list of keypoints through any of the OpenCV keypoint 
-              detection algorithms
-    matches - A list of matches of corresponding keypoints through any
-              OpenCV keypoint matching algorithm
-    """
-
     # Create a new output image that concatenates the two images together
     # (a.k.a) a montage
     rows1 = img1.shape[0]
@@ -149,31 +157,6 @@ def calcMatchesPosition(img1, kp1, img2, kp2, matches):
         error_total_y += error_y
     return (error_total_x/ratio_x + error_total_y/ratio_y) / 2
 
-
-db_imgs = []
-db_files = []#['db/monalisa.jpg', 'db/starwars1.jpg', 'db/starwars2.jpg']
-db_kp = []
-db_des = []
-# Create ORB detector with 1000 keypoints with a scaling pyramid factor of 1.2
-orb = cv2.ORB(1000, 1.2)
-# Load images from database
-for file in glob.glob("./static/db/*.jpg"):
-    print(file)
-    db_files.append(file)
-
-for i_img in range(len(db_files)):
-    img = cv2.imread(db_files[i_img], 0)
-    cols,rows = img.shape
-    img = cv2.resize(img, (500*rows/cols,500))
-    #cv2.imshow('teste', img)
-    #cv2.waitKey(0)
-    db_imgs.append(img)
-    (kp, des) = orb.detectAndCompute(db_imgs[i_img], None)
-    db_kp.append(kp)
-    db_des.append(des)
-# Create matcher
-bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-
 def findMatch(img_filename):
 
     error_imgs = []
@@ -215,5 +198,5 @@ def findMatch(img_filename):
 
     print 'ERROR: ' + str(smallest_error)
     if smallest_error > 1000:
-        return 'it didn\'t match any files!'
+        return None
     return db_files[best_match]
