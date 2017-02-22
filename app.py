@@ -29,9 +29,12 @@ def detect_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            ret = 'image detected: ' + str(detection.findMatch(app.config['UPLOAD_FOLDER'] + '/' + filename))
-            return ret
+            image_ret = detection.findMatch(app.config['UPLOAD_FOLDER'] + '/' + filename)
+            return html_image(image_ret)
     return upload_page()
+
+def html_image(filename):
+    return '<html><head></head><body><img src=\'./' + filename + '\' height="500" width=250"></body></html>'
 
 @app.route('/', methods=['GET'])
 def upload_page():

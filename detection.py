@@ -1,4 +1,5 @@
 # coding=utf-8
+import glob, os
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt
@@ -156,8 +157,7 @@ db_des = []
 # Create ORB detector with 1000 keypoints with a scaling pyramid factor of 1.2
 orb = cv2.ORB(1000, 1.2)
 # Load images from database
-import glob, os
-for file in glob.glob("./db/*.jpg"):
+for file in glob.glob("./static/db/*.jpg"):
     print(file)
     db_files.append(file)
 
