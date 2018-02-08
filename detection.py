@@ -125,8 +125,8 @@ def calcMatchesPosition(img1, kp1, img2, kp2, matches):
         ratio_x /= count_x
     if count_y > 0:
         ratio_y /= count_y
-    print 'ratiox: ' + str(ratio_x)
-    print 'ratioy: ' + str(ratio_y)
+    print('ratiox: ' + str(ratio_x))
+    print('ratioy: ' + str(ratio_y))
 
     # para calcular o erro de posicionamento de cada ponto
     for pos1 in range(len(matches)-1):
@@ -178,10 +178,10 @@ def findMatch(img_filename):
         sum = 0
         total = 20
         for num in range(0,total):
-            print 'matches: ' + str(matches[num].distance)
+            print('matches: ' + str(matches[num].distance))
             sum += matches[num].distance
         sum /= total
-        print 'media: ' + str(sum)
+        print('media: ' + str(sum))
         # Show only the top 10 matches - also save a copy for use later
 
         error = calcMatchesPosition(img, kp1, db_imgs[i_img], db_kp[i_img], matches[0:total])
@@ -196,7 +196,7 @@ def findMatch(img_filename):
             smallest_error = error_imgs[num]
             best_match = num
 
-    print 'ERROR: ' + str(smallest_error)
+    print('ERROR: ' + str(smallest_error))
     if smallest_error > 1000:
         return None
     return db_files[best_match]
